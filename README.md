@@ -137,6 +137,11 @@ Content-Type: application/json
 }
 ```
 
+## 参考链接
+
+- [讯飞长文本语音合成 API 文档](https://www.xfyun.cn/doc/tts/long_text_tts/API.html#%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E)
+- [讯飞开放平台控制台](https://console.xfyun.cn/app/myapp)
+
 ## 学习重点
 
 本项目的重点是掌握接入第三方 API 的通用方法：
