@@ -1,10 +1,15 @@
 package org.example.file_api.xfyun;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import org.example.file_api.xfyun.XfyunLongTextTtsProperties;
+import org.springframework.stereotype.Component;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
+
+@Component
 public class XfyunLongTextTtsSigner {   //监管 把这个合法请求签名盖章
     // 1 格式化date
     String formatDate(ZonedDateTime date) {
@@ -30,12 +35,35 @@ public class XfyunLongTextTtsSigner {   //监管 把这个合法请求签名盖�
 
     // 2 拼接代签名原文
     String buildSignatureOrigin(String host, String formattedDate, String method, String path){
-
+        return "host: " + host + "\n" +
+                "date: " + formattedDate + "\n" +
+                method + " " + path + " HTTP/1.1";
     }
 
     // 3 用apiSecret计算HMAC-SHA256签名
-    String sign(String signatureOrigin, String apiSecret){}
+    String sign(String signatureOrigin, String apiSecret){
+        try {
+            //1 创建HmacSHA256的Mac对象
+            //2 使用apiSecret创建SecretKeySpec
+            //3 使用密钥初始化Mac
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(
+                    apiSecret.getBytes(StandardCharsets.UTF_8),
+                    "HmacSHA256"
+            );
+            mac.init(secretKey);
+            byte[] signatureBytes = mac.doFinal(signatureOrigin.getBytes(StandardCharsets.UTF_8));  //doFinal()计算HMAC得到二进制byte[]
+            return Base64.getEncoder().encodeToString(signatureBytes);  //把二进制转换成可传输字符串
+        } catch (Exception e) {
+            throw new IllegalStateException("生成讯飞签名失败", e);
+        }
+    }
 
     // 4 生成authorization字符串
-    String buildAuthorization(String apiKey, String signature){}
+    String buildAuthorization(String apiKey, String signature) {
+        String authorizationOrigin = "api_key=\"" + apiKey +
+                "\", algorithm=\"hmac-sha256\", headers=\"host date request-line\", signature=\""
+                + signature + "\"";
+        return Base64.getEncoder().encodeToString(authorizationOrigin.getBytes(StandardCharsets.UTF_8));
+    }
 }
