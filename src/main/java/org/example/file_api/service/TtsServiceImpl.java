@@ -3,6 +3,7 @@ package org.example.file_api.service;
 import org.example.file_api.dto.TtsSynthesizeResult;
 import org.example.file_api.dto.TtsSynthesizeRequest;
 import org.example.file_api.dto.TtsSynthesizeResp;
+import org.example.file_api.dto.TtsTaskStatus;
 import org.example.file_api.xfyun.XfyunLongTextTtsProperties;
 import org.example.file_api.xfyun.XfyunLongTextTtsProvider;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,15 @@ public class TtsServiceImpl implements TtsService{
 
             result = provider.queryTask(taskId);
 
-            if (result.isFinished()) {
+            if (result.getStatus() == TtsTaskStatus.SUCCESS) {
                 break;
+            }
+            if (result.getStatus() == TtsTaskStatus.FAILED) {
+                throw new IllegalStateException("讯飞任务失败, code=" + result.getErrorCode() + ", message=" + result.getMessage());
             }
         }
 
-        if (result == null || !result.isFinished()) {
+        if (result == null || result.getStatus() != TtsTaskStatus.SUCCESS) {
             throw new IllegalStateException("讯飞长文本合成超时");
         }
 

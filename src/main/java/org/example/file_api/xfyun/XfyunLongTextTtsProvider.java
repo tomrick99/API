@@ -2,6 +2,7 @@ package org.example.file_api.xfyun;
 
 import org.example.file_api.dto.TtsSynthesizeResult;
 import org.example.file_api.dto.TtsSynthesizeRequest;
+import org.example.file_api.dto.TtsTaskStatus;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -68,9 +69,9 @@ public class XfyunLongTextTtsProvider {     //像外包 不是自己转成音频
     //发起长文本合成任务
     public String createTask(TtsSynthesizeRequest request){
         //1 构造带鉴权参数的create URI
-        System.out.println("appId blank = " + properties.getAppId().isBlank());
-        System.out.println("apiKey blank = " + properties.getApiKey().isBlank());
-        System.out.println("apiSecret blank = " + properties.getApiSecret().isBlank());
+//        System.out.println("appId blank = " + properties.getAppId().isBlank());
+//        System.out.println("apiKey blank = " + properties.getApiKey().isBlank());
+//        System.out.println("apiSecret blank = " + properties.getApiSecret().isBlank());
         URI uri = buildAuthorizedUri("POST", properties.getCreatePath());
 
         String encodedText = encodeTextForPayload(request.getText());
@@ -211,8 +212,10 @@ public class XfyunLongTextTtsProvider {     //像外包 不是自己转成音频
             result.setMessage(message);
 
             //接口返回code不是0 就先认为没有成功完成
+            //讯飞明确说这次的任务失败了 不用再继续等了
             if (!"0".equals(code)){
-                result.setFinished(false);
+                result.setStatus(TtsTaskStatus.FAILED); //把失败状态带回service
+                result.setErrorCode(code);  //把失败码也带回去 后面报错更准确
                 return result;
             }
 
@@ -220,9 +223,9 @@ public class XfyunLongTextTtsProvider {     //像外包 不是自己转成音频
             //两层audio的原因是因为这是第三方接口协议设计
             String encodedAudioUrl = root.path("payload").path("audio").path("audio").asText();
 
-            //如果还没有音频地址说明任务没有完成
+            //如果任务没失败 但音频也没准备好
             if (encodedAudioUrl == null || encodedAudioUrl.isBlank()){
-                result.setFinished(false);
+                result.setStatus(TtsTaskStatus.PROCESSING);//告诉service继续轮询
                 return result;
             }
 
@@ -233,7 +236,7 @@ public class XfyunLongTextTtsProvider {     //像外包 不是自己转成音频
             );
 
             //表示任务完成拿到了音频地址
-            result.setFinished(true);
+            result.setStatus(TtsTaskStatus.SUCCESS);//成功了说明就能正确的下载音频了
             result.setAudioUrl(audioUrl);
             return result;
         } catch (Exception e){

@@ -1,6 +1,7 @@
 package org.example.file_api.controller;
 
 
+import jakarta.validation.Valid;
 import org.example.file_api.dto.TtsSynthesizeRequest;
 import org.example.file_api.dto.TtsSynthesizeResp;
 import org.example.file_api.service.TtsService;
@@ -21,7 +22,7 @@ public class TtsController {
     }
 
     @PostMapping("/synthesize")     //表示完整的地址是POST /tts/synthesize
-    public TtsSynthesizeResp synthesize(@RequestBody TtsSynthesizeRequest request) {    //表示请求体里的JSON要转成Java对象 Spring Boot会自动用ObjectMapper
+    public TtsSynthesizeResp synthesize(@Valid @RequestBody TtsSynthesizeRequest request) {    //表示请求体里的JSON要转成Java对象 Spring Boot会自动用ObjectMapper
         return ttsService.synthesize(request);
     }
 }

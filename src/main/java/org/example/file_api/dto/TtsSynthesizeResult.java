@@ -10,7 +10,8 @@ import lombok.Data;
 
 @Data
 public class TtsSynthesizeResult {
-    private boolean finished;
+    private TtsTaskStatus status;
+    private String errorCode;
     private String audioUrl;
     private String message;
 

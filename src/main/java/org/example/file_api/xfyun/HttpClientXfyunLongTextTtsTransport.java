@@ -21,19 +21,26 @@ public class HttpClientXfyunLongTextTtsTransport    //真正的快递员
                     HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8)  //这是在把Java字符串jsonBody变成HttpClient能发送的字节
                 )
                 .build();   //有了上面的信息现在生成正式的HTTP请求对象
-        HttpResponse<String> response = null; //告诉服务器返回的响应正文按照什么形式读回来
         try {                   //正常发请求 拿响应
-            response = httpClient.send(
+            HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)  //服务器返回的body按UTF-8返回
             );
+
+            if (response.statusCode() < 200 || response.statusCode() > 299) {
+                throw new XfyunRequestException(
+                        response.statusCode(),
+                        response.body()
+                );
+            }
+            return response.body();
+
         } catch (IOException e) {   //网络读写失败
             throw new IllegalStateException("调用讯飞接口失败", e);
         } catch (InterruptedException e) {  //等待响应时被打断  先恢复终端标记再抛业务异常
             Thread.currentThread().interrupt();
             throw new IllegalStateException("调用讯飞接口被中断", e);
         }
-        return response.body();
     }
 
     @Override
@@ -51,6 +58,9 @@ public class HttpClientXfyunLongTextTtsTransport    //真正的快递员
                     request,
                     HttpResponse.BodyHandlers.ofByteArray() //服务器返回的body要按byte[]读取
             );
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IllegalStateException("下载音频失败, HTTP状态码: " + response.statusCode());
+            }
             return response.body();     //返回服务器响应里的正文
         } catch (IOException e) {
             throw new IllegalStateException("调用讯飞接口失败", e);

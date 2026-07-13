@@ -28,6 +28,9 @@ host = ...properties.getHost()来接受参数了
 	把这个host作为参数传给buildSignatureOrigin()
 	
 3 接口文件得把class改成interface
+    class 真正能new出来的一个对象
+    interface 规定
+    exception 要throw出去的一个对象
 
 4 补HTTP和JSON
 	POST新增提交
@@ -207,5 +210,7 @@ host = ...properties.getHost()来接受参数了
 	5 Spring Boot 环境变量占位符必须和正式环境变量名字一致
 	
 	6 类名要统一
+
+	7 注解后面不要加分号
 	
 	
