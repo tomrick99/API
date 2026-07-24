@@ -1,6 +1,7 @@
 package org.example.file_api.service;
 
 import org.example.file_api.dto.MaterialCreateReqDTO;
+import org.example.file_api.dto.MaterialPageRespDTO;
 import org.example.file_api.dto.MaterialRespDTO;
 import org.example.file_api.dto.MaterialUpdateReqDTO;
 import org.example.file_api.material.domain.MaterialDO;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -188,6 +190,33 @@ public class MaterialServiceImplTest {
 
         verify(materialMapper).selectById(1L);
         verify(materialMapper).deleteById(1L);
+    }
+
+    // 分页Service测试
+    @Test
+    void shouldListMaterialsByTypeWithPagination() {
+        MaterialDO material = new MaterialDO();
+        material.setId(1L);
+        material.setTitle("Java资料");
+        material.setType("note");
+        material.setDescription("分页测试");
+        material.setCreatedAt(LocalDateTime.now());
+        material.setUpdatedAt(material.getCreatedAt());
+
+        when(materialMapper.selectByTypeOrderByCreatedAtDesc("note", 10, 10))
+                .thenReturn(List.of(material));
+        when(materialMapper.countByType("note")).thenReturn(11L);
+
+        MaterialPageRespDTO response = materialService.listMaterials("note", 2, 10);
+
+        assertEquals(1, response.getRecords().size());
+        assertEquals(11L, response.getTotal());
+        assertEquals(2L, response.getPage());
+        assertEquals(10L, response.getPageSize());
+        assertEquals("Java资料", response.getRecords().getFirst().getTitle());
+
+        verify(materialMapper).selectByTypeOrderByCreatedAtDesc("note", 10, 10);
+        verify(materialMapper).countByType("note");
     }
 
     @Test

@@ -2,6 +2,7 @@ package org.example.file_api.service;
 
 import jakarta.transaction.Transactional;
 import org.example.file_api.dto.MaterialCreateReqDTO;
+import org.example.file_api.dto.MaterialPageRespDTO;
 import org.example.file_api.dto.MaterialRespDTO;
 import org.example.file_api.dto.MaterialUpdateReqDTO;
 import org.example.file_api.material.domain.MaterialDO;
@@ -9,6 +10,7 @@ import org.example.file_api.material.mapper.MaterialMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MaterialServiceImpl implements MaterialService {
@@ -79,6 +81,31 @@ public class MaterialServiceImpl implements MaterialService {
         }
 
         materialMapper.deleteById(id);
+    }
+
+    // 新增分页业务 效验页码不小于1 效验每页数量必须是1到100
+    @Override
+    public MaterialPageRespDTO listMaterials(String type, long page, long pageSize) {
+        if (page < 1) {
+            throw new IllegalArgumentException("page必须大于等于1");
+        }
+        if (pageSize < 1 || pageSize > 100) {
+            throw new IllegalArgumentException("pageSize必须在1到100之间");
+        }
+
+        long offset = (page - 1) * pageSize;
+        List<MaterialRespDTO> records = materialMapper
+                .selectByTypeOrderByCreatedAtDesc(type, pageSize, offset)
+                .stream()
+                .map(this::toRespDTO)
+                .toList();
+
+        MaterialPageRespDTO response = new MaterialPageRespDTO();
+        response.setRecords(records);
+        response.setTotal(materialMapper.countByType(type));
+        response.setPage(page);
+        response.setPageSize(pageSize);
+        return response;
     }
 
     private MaterialRespDTO toRespDTO(MaterialDO material) {

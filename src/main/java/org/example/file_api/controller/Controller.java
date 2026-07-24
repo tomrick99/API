@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController     //告诉Spring这是接受http请求的一个类 类中所有方法的返回值自动写入HTTP响应体
-@RequestMapping("/api/materials")
+@RequestMapping("/api/test/materials")
 public class Controller {
 
     private final MaterialRepository materialRepository;

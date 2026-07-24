@@ -118,6 +118,7 @@ class MaterialMapperTest {
         assertEquals(1, firstPage.size());
         assertEquals(1, secondPage.size());
         assertTrue(firstPage.getFirst().getCreatedAt().isAfter(secondPage.getFirst().getCreatedAt()));
+        assertEquals(2, materialMapper.countByType("video"));
     }
 
     private MaterialDO newTestMaterial(String titlePart, String type) {

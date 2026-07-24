@@ -1,6 +1,7 @@
 package org.example.file_api.service;
 
 import org.example.file_api.dto.MaterialCreateReqDTO;
+import org.example.file_api.dto.MaterialPageRespDTO;
 import org.example.file_api.dto.MaterialRespDTO;
 import org.example.file_api.dto.MaterialUpdateReqDTO;
 
@@ -14,4 +15,6 @@ public interface MaterialService {
     MaterialRespDTO updateMaterial(Long id, MaterialUpdateReqDTO request);
 
     void deleteMaterial(Long id);
+
+    MaterialPageRespDTO listMaterials(String type, long page, long pageSize);
 }
