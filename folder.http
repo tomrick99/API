@@ -1,0 +1,49 @@
+### 1. 登录: 执行后自动保存token
+# @name login
+POST http://localhost:8081/auth/login
+Content-Type: application/json
+
+{
+  "username": "demo",
+  "password": "123456"
+}
+
+> {%
+    client.global.set("folderToken", response.body.accessToken);
+%}
+
+
+
+### 2. 新建文件夹
+POST http://localhost:8081/api/folders
+Authorization: Bearer {{folderToken}}
+Content-Type: application/json
+
+{
+  "name": "HTTP Client 测试文件夹",
+  "description": "测试 Folder 链路",
+  "sort": 10
+}
+
+> {%
+    client.global.set("id", response.body.id);
+%}
+
+### 3. 按 ID 查询
+GET http://localhost:8081/api/folders/{{id}}
+Authorization: Bearer {{folderToken}}
+
+### 4. 更新：把 1 换成真实创建出来的 id
+PUT http://localhost:8081/api/folders/{{id}}
+Authorization: Bearer {{folderToken}}
+Content-Type: application/json
+
+{
+  "name": "更新后的文件夹",
+  "description": "更新测试",
+  "sort": 20
+}
+
+### 5. 删除
+DELETE http://localhost:8081/api/folders/{{id}}
+Authorization: Bearer {{folderToken}}

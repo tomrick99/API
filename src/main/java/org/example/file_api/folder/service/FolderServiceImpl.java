@@ -21,6 +21,10 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public FolderRespDTO createFolder(FolderCreateReqDTO request) {
 
+        if(request==null){
+            throw new IllegalArgumentException();
+        }
+
         FolderDO folder = new FolderDO();
 
         folder.setName(request.getName());
@@ -44,6 +48,10 @@ public class FolderServiceImpl implements FolderService {
     // id不为null 也不代表数据库里面就有这个查询对象了
     @Override
     public FolderRespDTO getFolder(Long id) {
+
+        if(id==null){
+            throw new IllegalArgumentException();
+        }
 
         if (id == null) {
             throw new IllegalArgumentException("id is null");
