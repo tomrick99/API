@@ -36,3 +36,20 @@ build/
 src/main/resources/application.yml
 src/main/resources/application.yaml
 src/main/resources/application.properties
+
+### Runtime genrated files ###
+uploads/
+*.mp3
+
+### Logs ###
+logs/
+*.log
+
+### Local environment variables ###
+.env
+.env.*
+!.env.example
+
+### Operating system files ###
+.DS_Store
+Thumbs.db
