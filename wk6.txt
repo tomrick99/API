@@ -405,3 +405,128 @@ MySQL 最终可以保存累计浏览次数，Redis 负责高并发计数。
 				只有一个构造器不用写@Autowired
 				
 		运行环境错误启动失败在SpringBoot embedded Tomcat windows文件系统
+		
+12 测试链路
+	当id不存在的时候后端本应该返回404 但是会错误返回message:请先登录
+	
+	问题:
+	1 Maven一开始无法运行 springdoc一开始没有写版本
+		解决: 需要补SpringBoot对应的Springdoc3.x或者暂时删除Swagger依赖
+		
+	2 2.8.16启动报错 适用于SpringBoot3 不适用于Boot4.1 
+	
+	3 3.0.3无法解析 不是版本不存在Maven无法访问Central下载依赖 
+	需要解决Maven网络TLS 代理或镜像问题
+	
+	4 IDEA里Jakarta/Lombok/Maybatis-Plus一起报红
+		Maven以为Springdoc依赖解析失败 这边刚刚依赖模型导入中断
+		解决: 修好/除以Springdoc后Reload Maven一开始无法运行
+		
+	5 浏览器不能直接验证localhost 内置浏览器拦截本地地址 整个依赖模型导入中断
+		方法: 用DIEA HTTP Client在根目录创建一个HTTP request文件(以.http结尾)
+		
+	6 HTTP Client查询/更新/删除返回请先登录
+		保存的是id, url却使用了folderId, 没有传正确记录Id 变量名没有统一
+		解决方法: 已经改成统一使用{{id}}链路可通
+		
+	当前链路任然存在的问题:
+	1 不存在的ID 非法的ID 参数效验失败的时候接口错误返回:message:请先登录
+	2 更新的时候如果没有传入description 返回JSON的description会是null 但是数据库任然还是保留旧值 
+	3 仓库里面的schema.sql没有这个项目(material_folder)的建表语句  本机已经有了建好的表 
+	但是换一台电脑或者新建数据库Folder会失败
+	4 没有Folder的测试
+	5 只有按ID查询 没有GET /api/folders 文件夹列表接口
+	6 insert, updateById, deleteById的受影响行数没有判断 极端并发或数据库写入失败时 接口可能任然返回成功
+	7 REST语义:
+		创建当前返回200 常见规范为201
+		删除当前返回200空响应 常见规范为204
+
+13 写测试: @SpringBootTest: 启动Spring 交给Spring Bean 在交给MapperBean最后到数据库
+  Service测试
+	1 如果我只创建对象，然后检查返回值，那是不是没有验证insert？
+	答: 调用service的测试 insert已经执行了 检查response验证还是不够深入
+		还得再查一次数据库是否对的上才是完整的闭环测试
+		
+	2 get测试和create不一样不要混在一起 
+	  get是根据id查询数据库返回一个dto
+	  不是因为get不用DTO 而是DTO请求/响应对象 而准备数据库测试数据应该使用DO
+	  直接用创建一个DO对象 然后使用mapper的insert把数据插入到数据库里
+	  测试查询就是查数据库里的对象是不是对的上DO对象里面的字段
+	  没必要再从头开始把全部链路走一通，这里要的是把 DO 这个对象放进数据库，然后从里面查询出来看一下是不是正确
+	  
+	3 Delete测试方法assertThrows里面的lambda 应该把会抛出来的异常放在后面的{}
+		Assertions.assertThrows(
+				NullPointerException.class,
+				() -> folderService.getFolder(folder.getId())
+		);但是不推荐用异常断言
+		
+		
+		最好是用: assertNull去看删除之后的数据库是不是空
+	
+  Controller测试
+	1 导包错误 
+	2 Controller测试加载范围太大 不用把@SpringBootTest @AutoConfigureMockMvc都写进去 
+	  不然会加载整一个项目
+	3 换一个方法 不用MockMVC:不在测试里面拼整个JSON
+		这个方法是Controller单元测试 调用Java方法
+		when()方法 是提前给假的Service规定链路已通
+		也就是假设request返回response成功 如果有人调用这个方法 就返回这个结果
+		
+		后面controller调用这个service就会返回一个成功且对应的response 不是去执行正真的业务
+		然后用assertSame去比较set的值和调用Controller返回的值到底是不是对的上的
+		
+		verify看是否调用的正确的依赖
+		
+	4 在Service里面 现在是创建一个根据查询id的对象 然后返回toRespDTO 如果查不到 整个对象为null值
+		然后直接去用方法访问这个对象的时候 会直接NPE
+		
+所以写测试不止是为了证明代码没有问题
+而是为了发现bug -> 修代码
+		
+	5 ControllerTest尽量写MockMvc+ObjectMapper
+		尽量不要写大量的JSON 容易犯错
+		
+	  而ServiceTest 不要MockMvc 直接folderService.createFolder(request)因为service不需要管HTTP
+	
+	6 在ControllerTest里的shouldRejectEmptyFolderName方法没有手动拼接JSON 
+		它创造了一个Java DTO的字符串传入一个空值Name
+		让ObjectMapper自动转成了JSON
+		MockMvc模拟的是HTTP请求
+		用上了objectMapper.writeValueAsString(request)
+		
+		流程:
+			request name是一个空值
+			-> 然后用objectMapper去生成一个假的Http请求
+			-> Spring MVC把这个JSON返回给FolderCreateReqDTO
+			-> @Valid检查@NotBlank 看到了这个name为空
+			-> 直接返回400 Bad Request
+			-> 不会进到Controller 方法体也不会执行
+			-> Service也不会被调用
+		
+	
+	7 代码在createFolder的时候如果request=null 会爆NPE
+		所以得在原Service里面增加判断逻辑 如果request=null 抛非法参数
+		但是一个好的业务 不会让这个代码报出异常 应该返回给用户一个400
+		
+		这里用到了assertThrows(期待返回的类型, () -> {});
+		
+		lambda的作用是包成了一个方法 有人调用然后JUnit会动执行它 延迟执行 先执行后面的那一块
+		
+		不用lambda的话 会在folderService.createFolder(null)就直接爆出来异常 JUnit压根碰不到
+		
+		整个测试的流程:
+		 ServiceImpl
+		 -> if(request=null)
+		 -> throw IllegalArgumentException
+		 -> Junit 断言捕获
+		 -> 测试通过
+		
+		不能加入verifyNoInteractions(folderMapper);
+		它的作用是看拒绝之后有没有继续执行后面的逻辑
+		因为Mockito的verify系列方法只能检查Mock对象
+		当前测试类用的是@SpringBootTest 集成测试 是真实的整个链路
+		
+		而Mock用的是单元测试
+		
+
+		
