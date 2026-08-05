@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * 创建全局异常处理器
  *
- * 这个Rest注解的意思是所有的Controller的公共异常接收器
+ * 这个RestControllerAdvice注解的意思是所有的Controller的公共异常接收器
  *
  * 链路就变成了Controller->Service->GlobalExceptionHandler接住->转换为HTTP状态码和JSON->返回前端
  * **/
@@ -32,7 +32,9 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
