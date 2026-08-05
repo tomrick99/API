@@ -148,16 +148,20 @@ class MaterialControllerTest {
 
     @Test
     void shouldRejectEmptyTitle() throws Exception {
+        MaterialCreateReqDTO request = new MaterialCreateReqDTO();
+        request.setTitle("");
+        request.setType("PDF");
+        request.setDescription("没有标题");
+
         mockMvc.perform(post("/api/materials")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "title": "",
-                                    "type": "PDF",
-                                    "description": "没有标题"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.message").value("title: 标题不能为空"))
+        .andExpect(jsonPath("$.path").value("/api/materials"))
+        .andExpect(jsonPath("$.timestamp").exists());
 
         verifyNoInteractions(materialService);
     }
@@ -189,7 +193,7 @@ class MaterialControllerTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenMaterialCreationFalse() throws Exception {
+    void shouldReturnInternalServerErrorWhenMaterialCreationFails() throws Exception {
         MaterialCreateReqDTO request = new MaterialCreateReqDTO();
         request.setTitle("Java 学习资料");
         request.setType("PDF");

@@ -98,7 +98,13 @@ class FolderControllerTest {
         mockMvc.perform(post("/api/folders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.message").value("name: folder title cannot be empty"))
+        .andExpect(jsonPath("$.path").value("/api/folders"))
+        .andExpect(jsonPath("$.timestamp").exists());
+
 
         // 参数效验发生在进入service之前
         verifyNoInteractions(folderService);
