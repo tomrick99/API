@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -142,20 +143,31 @@ public class FolderServiceTest {
 
     @Test
     void getNotExistIdTest(){
-        assertThrows(IllegalArgumentException.class,
-                () -> folderService.getFolder(null)
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> folderService.getFolder(Long.MAX_VALUE)
         );
     }
 
     @Test
     void updateNotExistIdTest(){
-        assertThrows(IllegalArgumentException.class,() -> folderService.updateFolder(null, null));
+        FolderUpdateReqDTO request = new FolderUpdateReqDTO();
+        request.setName("not extist");
+        request.setDescription("desc not extist");
+        request.setSort(300);
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> folderService.updateFolder(Long.MAX_VALUE, request));
 
     }
 
     @Test
     void deleteNotExistIdTest(){
-        assertThrows(IllegalArgumentException.class,() -> folderService.deleteFolder(null));
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> folderService.deleteFolder(Long.MAX_VALUE));
     }
 
 

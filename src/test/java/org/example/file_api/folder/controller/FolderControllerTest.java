@@ -22,6 +22,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import org.example.file_api.common.exception.GlobalExceptionHandler;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class FolderControllerTest {
@@ -42,7 +47,9 @@ class FolderControllerTest {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(folderController)
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(folderController)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .setValidator(validator)
                 .build();
         objectMapper = new ObjectMapper();
@@ -95,5 +102,19 @@ class FolderControllerTest {
 
         // 参数效验发生在进入service之前
         verifyNoInteractions(folderService);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenFolderDoesNotExist() throws Exception {
+        when(folderService.getFolder(999L)).thenThrow(new ResourceNotFoundException("Folder is not exist: 999"));
+
+        mockMvc.perform(get("/api/folders/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Folder is not exist: 999"))
+                .andExpect(jsonPath("$.path").value("/api/folders/999"));
+
+        verify(folderService).getFolder(999L);
     }
 }
