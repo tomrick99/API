@@ -1,5 +1,6 @@
 package org.example.file_api.material.controller;
 
+import org.example.file_api.material.dto.MaterialCreateReqDTO;
 import org.example.file_api.material.dto.MaterialRespDTO;
 import org.example.file_api.material.dto.MaterialPageRespDTO;
 import org.example.file_api.material.service.MaterialService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +36,9 @@ class MaterialControllerTest {
 
     @MockitoBean
     private MaterialService materialService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void shouldCreateMaterial() throws Exception {
@@ -169,7 +174,7 @@ class MaterialControllerTest {
     }
 
     @Test
-    void sholdReturnNotFoundWhenMaterialDoesNotExist() throws Exception {
+    void shouldReturnNotFoundWhenMaterialDoesNotExist() throws Exception {
         when(materialService.getMaterial(999L))
                 .thenThrow(new ResourceNotFoundException("资料不存在: 999"));
 
@@ -181,6 +186,28 @@ class MaterialControllerTest {
                 .andExpect(jsonPath("$.path").value("/api/materials/999"));
 
         verify(materialService).getMaterial(999L);
+    }
+
+    @Test
+    void shouldReturnInternalServerErrorWhenMaterialCreationFalse() throws Exception {
+        MaterialCreateReqDTO request = new MaterialCreateReqDTO();
+        request.setTitle("Java 学习资料");
+        request.setType("PDF");
+        request.setDescription("MyBatis 学习笔记");
+
+        when(materialService.createMaterial(any()))
+                .thenThrow(new IllegalStateException("资料创建失败"));
+
+        mockMvc.perform(post("/api/materials")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.message").value("资料创建失败"))
+                .andExpect(jsonPath("$.path").value("/api/materials"));
+
+        verify(materialService).createMaterial(any());
     }
 }
 
