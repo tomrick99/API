@@ -1,8 +1,8 @@
 package org.example.file_api.practice.web;
 
-import org.example.file_api.dto.MaterialRequest;
-import org.example.file_api.entity.Material;
-import org.example.file_api.repository.MaterialRepository;
+import org.example.file_api.practice.jpa.material.dto.MaterialRequest;
+import org.example.file_api.practice.jpa.material.entity.Material;
+import org.example.file_api.practice.jpa.material.repository.MaterialRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

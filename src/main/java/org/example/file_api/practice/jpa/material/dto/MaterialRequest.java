@@ -1,4 +1,4 @@
-package org.example.file_api.dto;
+package org.example.file_api.practice.jpa.material.dto;
 //dto 把前端传过来的JSON数据封装成一个JAVA对象
 public class MaterialRequest {
 

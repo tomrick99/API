@@ -1,4 +1,4 @@
-package org.example.file_api.entity;
+package org.example.file_api.practice.jpa.material.entity;
 
 import jakarta.persistence.*;
 
