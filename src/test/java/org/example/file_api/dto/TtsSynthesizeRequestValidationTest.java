@@ -4,6 +4,7 @@ package org.example.file_api.dto;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

@@ -1,7 +1,7 @@
-package org.example.file_api.service;
+package org.example.file_api.tts.service;
 
-import org.example.file_api.dto.TtsSynthesizeRequest;
-import org.example.file_api.dto.TtsSynthesizeResp;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.dto.TtsSynthesizeResp;
 
 //业务服务层的接口
 public interface TtsService {

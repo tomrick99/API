@@ -1,4 +1,4 @@
-package org.example.file_api.xfyun;
+package org.example.file_api.tts.provider.xfyun;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

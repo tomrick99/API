@@ -1,11 +1,11 @@
-package org.example.file_api.service;
+package org.example.file_api.tts.service;
 
-import org.example.file_api.dto.TtsSynthesizeResult;
-import org.example.file_api.dto.TtsSynthesizeRequest;
-import org.example.file_api.dto.TtsSynthesizeResp;
-import org.example.file_api.dto.TtsTaskStatus;
-import org.example.file_api.xfyun.XfyunLongTextTtsProperties;
-import org.example.file_api.xfyun.XfyunLongTextTtsProvider;
+import org.example.file_api.tts.dto.TtsSynthesizeResult;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.dto.TtsSynthesizeResp;
+import org.example.file_api.tts.dto.TtsTaskStatus;
+import org.example.file_api.tts.provider.xfyun.XfyunLongTextTtsProperties;
+import org.example.file_api.tts.provider.xfyun.XfyunLongTextTtsProvider;
 import org.springframework.stereotype.Service;
 
 //监管 负责检查订单有没有问题 比如文字输入的validation

@@ -1,10 +1,10 @@
-package org.example.file_api.controller;
+package org.example.file_api.tts.controller;
 
 
 import jakarta.validation.Valid;
-import org.example.file_api.dto.TtsSynthesizeRequest;
-import org.example.file_api.dto.TtsSynthesizeResp;
-import org.example.file_api.service.TtsService;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.dto.TtsSynthesizeResp;
+import org.example.file_api.tts.service.TtsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

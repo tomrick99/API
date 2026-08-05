@@ -1,8 +1,8 @@
-package org.example.file_api.xfyun;
+package org.example.file_api.tts.provider.xfyun;
 
-import org.example.file_api.dto.TtsSynthesizeResult;
-import org.example.file_api.dto.TtsSynthesizeRequest;
-import org.example.file_api.dto.TtsTaskStatus;
+import org.example.file_api.tts.dto.TtsSynthesizeResult;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.dto.TtsTaskStatus;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 

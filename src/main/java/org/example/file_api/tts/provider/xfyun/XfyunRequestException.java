@@ -1,4 +1,4 @@
-package org.example.file_api.xfyun;
+package org.example.file_api.tts.provider.xfyun;
 
 //extends RuntimeException 这是一个运行时的异常 科研直接throw不用在方法签名里面些throws
 public class XfyunRequestException extends RuntimeException {

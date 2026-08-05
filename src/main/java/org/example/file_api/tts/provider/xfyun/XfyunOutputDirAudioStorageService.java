@@ -1,6 +1,6 @@
-package org.example.file_api.xfyun;
+package org.example.file_api.tts.provider.xfyun;
 
-import org.example.file_api.service.AudioStorageService;
+import org.example.file_api.tts.service.AudioStorageService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

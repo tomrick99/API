@@ -1,4 +1,4 @@
-package org.example.file_api.dto;
+package org.example.file_api.tts.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

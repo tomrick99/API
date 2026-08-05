@@ -1,10 +1,12 @@
 package org.example.file_api.service;
 
-import org.example.file_api.dto.TtsSynthesizeRequest;
-import org.example.file_api.dto.TtsSynthesizeResult;
-import org.example.file_api.dto.TtsTaskStatus;
-import org.example.file_api.xfyun.XfyunLongTextTtsProperties;
-import org.example.file_api.xfyun.XfyunLongTextTtsProvider;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.dto.TtsSynthesizeResult;
+import org.example.file_api.tts.dto.TtsTaskStatus;
+import org.example.file_api.tts.provider.xfyun.XfyunLongTextTtsProperties;
+import org.example.file_api.tts.provider.xfyun.XfyunLongTextTtsProvider;
+import org.example.file_api.tts.service.AudioStorageService;
+import org.example.file_api.tts.service.TtsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
