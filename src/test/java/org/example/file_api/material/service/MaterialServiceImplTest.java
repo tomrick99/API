@@ -1,4 +1,4 @@
-package org.example.file_api.service;
+package org.example.file_api.material.service;
 
 import org.example.file_api.material.dto.MaterialCreateReqDTO;
 import org.example.file_api.material.dto.MaterialPageRespDTO;
@@ -6,7 +6,6 @@ import org.example.file_api.material.dto.MaterialRespDTO;
 import org.example.file_api.material.dto.MaterialUpdateReqDTO;
 import org.example.file_api.material.domain.MaterialDO;
 import org.example.file_api.material.mapper.MaterialMapper;
-import org.example.file_api.material.service.MaterialServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

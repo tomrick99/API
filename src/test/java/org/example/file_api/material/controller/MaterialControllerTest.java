@@ -1,8 +1,7 @@
-package org.example.file_api.controller;
+package org.example.file_api.material.controller;
 
 import org.example.file_api.material.dto.MaterialRespDTO;
 import org.example.file_api.material.dto.MaterialPageRespDTO;
-import org.example.file_api.material.controller.MaterialController;
 import org.example.file_api.material.service.MaterialService;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;

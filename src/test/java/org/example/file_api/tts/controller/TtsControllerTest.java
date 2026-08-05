@@ -1,8 +1,7 @@
-package org.example.file_api.controller;
+package org.example.file_api.tts.controller;
 
 import org.example.file_api.tts.dto.TtsSynthesizeResp;
 import org.example.file_api.tts.service.TtsService;
-import org.example.file_api.tts.controller.TtsController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
