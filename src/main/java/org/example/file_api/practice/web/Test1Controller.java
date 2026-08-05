@@ -1,4 +1,4 @@
-package org.example.file_api.practice;
+package org.example.file_api.practice.web;
 import org.springframework.web.bind.annotation.*;
 
 @RestController//接口控制器 交给spring管 收前端的request
