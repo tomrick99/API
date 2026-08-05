@@ -1,8 +1,9 @@
 package org.example.file_api.controller;
 
-import org.example.file_api.dto.MaterialRespDTO;
-import org.example.file_api.dto.MaterialPageRespDTO;
-import org.example.file_api.service.MaterialService;
+import org.example.file_api.material.dto.MaterialRespDTO;
+import org.example.file_api.material.dto.MaterialPageRespDTO;
+import org.example.file_api.material.controller.MaterialController;
+import org.example.file_api.material.service.MaterialService;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

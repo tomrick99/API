@@ -1,13 +1,13 @@
-package org.example.file_api.dto;
+package org.example.file_api.material.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-// 这个类表示 增资料的时候前端传过来的数据
-public class MaterialCreateReqDTO {
+// 更新资料的时候用 之后可能会修改 更新的时候可能允许只改description title不一定传
+public class MaterialUpdateReqDTO {
 
     @NotBlank(message = "标题不能为空")
-    @Size(max = 200, message = "标题长度不能超过两百")
+    @Size(max = 200, message = "标题长度不能超过200")
     private String title;
 
     @Size(max = 50, message = "类型长度不能超过50")

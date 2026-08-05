@@ -1,9 +1,9 @@
-package org.example.file_api.service;
+package org.example.file_api.material.service;
 
-import org.example.file_api.dto.MaterialCreateReqDTO;
-import org.example.file_api.dto.MaterialPageRespDTO;
-import org.example.file_api.dto.MaterialRespDTO;
-import org.example.file_api.dto.MaterialUpdateReqDTO;
+import org.example.file_api.material.dto.MaterialCreateReqDTO;
+import org.example.file_api.material.dto.MaterialPageRespDTO;
+import org.example.file_api.material.dto.MaterialRespDTO;
+import org.example.file_api.material.dto.MaterialUpdateReqDTO;
 
 // Service层的接口 不写具体实现只定义这个业务模块可以做什么
 public interface MaterialService {

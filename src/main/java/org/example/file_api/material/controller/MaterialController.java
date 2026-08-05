@@ -1,11 +1,11 @@
-package org.example.file_api.controller;
+package org.example.file_api.material.controller;
 
 import jakarta.validation.Valid;
-import org.example.file_api.dto.MaterialCreateReqDTO;
-import org.example.file_api.dto.MaterialPageRespDTO;
-import org.example.file_api.dto.MaterialRespDTO;
-import org.example.file_api.dto.MaterialUpdateReqDTO;
-import org.example.file_api.service.MaterialService;
+import org.example.file_api.material.dto.MaterialCreateReqDTO;
+import org.example.file_api.material.dto.MaterialPageRespDTO;
+import org.example.file_api.material.dto.MaterialRespDTO;
+import org.example.file_api.material.dto.MaterialUpdateReqDTO;
+import org.example.file_api.material.service.MaterialService;
 import org.springframework.web.bind.annotation.*;
 
 // 核心链路 HTTP JSON -> MaterialController -> MaterialService
