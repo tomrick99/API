@@ -1,4 +1,4 @@
-package org.example.file_api.dto;
+package org.example.file_api.security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

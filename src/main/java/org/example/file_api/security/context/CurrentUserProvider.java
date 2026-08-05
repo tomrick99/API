@@ -1,5 +1,6 @@
-package org.example.file_api.security;
+package org.example.file_api.security.context;
 
+import org.example.file_api.security.model.LoginUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

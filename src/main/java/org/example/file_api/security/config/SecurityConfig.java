@@ -1,9 +1,9 @@
-package org.example.file_api.config;
+package org.example.file_api.security.config;
 
-import org.example.file_api.security.JwtAuthenticationFilter;
-import org.example.file_api.security.LoginUser;
-import org.example.file_api.security.TenantContextFilter;
-import org.example.file_api.security.TokenService;
+import org.example.file_api.security.filter.JwtAuthenticationFilter;
+import org.example.file_api.security.model.LoginUser;
+import org.example.file_api.security.filter.TenantContextFilter;
+import org.example.file_api.security.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;

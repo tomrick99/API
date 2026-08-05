@@ -1,4 +1,4 @@
-package org.example.file_api.security;
+package org.example.file_api.security.context;
 
 /**
  * 保存当前 HTTP 请求已验证过的租户 ID。

@@ -1,4 +1,4 @@
-package org.example.file_api.security;
+package org.example.file_api.security.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,9 +1,11 @@
-package org.example.file_api.security;
+package org.example.file_api.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.file_api.security.model.LoginUser;
+import org.example.file_api.security.context.TenantContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

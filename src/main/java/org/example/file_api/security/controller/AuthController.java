@@ -1,9 +1,9 @@
-package org.example.file_api.controller;
+package org.example.file_api.security.controller;
 
 import jakarta.validation.Valid;
-import org.example.file_api.dto.LoginRequest;
-import org.example.file_api.dto.LoginResponse;
-import org.example.file_api.security.TokenService;
+import org.example.file_api.security.dto.LoginRequest;
+import org.example.file_api.security.dto.LoginResponse;
+import org.example.file_api.security.service.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

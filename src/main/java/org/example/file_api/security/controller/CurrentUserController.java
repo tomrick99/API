@@ -1,6 +1,6 @@
-package org.example.file_api.controller;
+package org.example.file_api.security.controller;
 
-import org.example.file_api.security.CurrentUserProvider;
+import org.example.file_api.security.context.CurrentUserProvider;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

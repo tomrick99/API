@@ -1,4 +1,4 @@
-package org.example.file_api.controller;
+package org.example.file_api.security.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

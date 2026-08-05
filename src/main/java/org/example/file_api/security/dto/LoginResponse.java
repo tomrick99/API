@@ -1,4 +1,4 @@
-package org.example.file_api.dto;
+package org.example.file_api.security.dto;
 
 /**
  * 登录成功后返回给前端的数据。

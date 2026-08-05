@@ -1,4 +1,4 @@
-package org.example.file_api.security;
+package org.example.file_api.security.service;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
