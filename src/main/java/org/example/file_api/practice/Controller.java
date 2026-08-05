@@ -1,4 +1,4 @@
-package org.example.file_api.controller;
+package org.example.file_api.practice;
 
 import org.example.file_api.dto.MaterialRequest;
 import org.example.file_api.entity.Material;

@@ -7,7 +7,7 @@ import org.example.file_api.security.controller.AuthController;
 import org.example.file_api.security.controller.CurrentUserController;
 import org.example.file_api.security.controller.MethodSecurityController;
 import org.example.file_api.security.controller.TenantController;
-import org.example.file_api.controller.Test2Controller;
+import org.example.file_api.practice.Test2Controller;
 import org.example.file_api.security.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

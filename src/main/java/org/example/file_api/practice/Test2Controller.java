@@ -1,4 +1,4 @@
-package org.example.file_api.controller;
+package org.example.file_api.practice;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
