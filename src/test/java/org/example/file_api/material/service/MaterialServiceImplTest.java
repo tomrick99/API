@@ -8,6 +8,7 @@ import org.example.file_api.material.domain.MaterialDO;
 import org.example.file_api.material.mapper.MaterialMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -104,12 +105,12 @@ public class MaterialServiceImplTest {
         // 假装mapper去查id=999时查不到 返回Null
         when(materialMapper.selectById(999L)).thenReturn(null);
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> materialService.getMaterial(999L)
         );
 
-        assertEquals("资料不存在", exception.getMessage());
+        assertEquals("资料不存在: 999", exception.getMessage());
 
         verify(materialMapper).selectById(999L);
 
@@ -160,12 +161,12 @@ public class MaterialServiceImplTest {
 
         when(materialMapper.selectById(999L)).thenReturn(null);
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> materialService.updateMaterial(999L, request)
         );
 
-        assertEquals("资料不存在", exception.getMessage());
+        assertEquals("资料不存在: 999", exception.getMessage());
 
         verify(materialMapper).selectById(999L);
         verify(materialMapper, never()).updateById(any(MaterialDO.class));
@@ -225,35 +226,63 @@ public class MaterialServiceImplTest {
         // 删除时资料不存在
         when(materialMapper.selectById(999L)).thenReturn(null);
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> materialService.deleteMaterial(999L)
         );
 
-        assertEquals("资料不存在", exception.getMessage());
+        assertEquals("资料不存在: 999", exception.getMessage());
 
         verify(materialMapper).selectById(999L);
         verify(materialMapper, never()).deleteById(999L);
     }
 
-//    @Test
-//    void shouldThrowExceptionWhenCreateMaterial() {
-//
-//        // 在创建资料的时候抛出异常
-//        MaterialCreateReqDTO request = new MaterialCreateReqDTO();
-//        request.setTitle("Java 基础笔记");
-//        request.setType("note");
-//        request.setDescription("Java 学习资料");
-//
-//        when(materialMapper.insert(any(MaterialDO.class))).thenReturn(0);
-//
-//        IllegalStateException exception = assertThrows(
-//                IllegalStateException.class,
-//                () -> materialService.createMaterial(request)
-//        );
-//
-//        assertEquals("资料库创建失败", exception.getMessage());
-//
-//        verify(materialMapper).insert(any(MaterialDO.class));
-//    }
+    @Test
+    void shouldThrowExceptionWhenMaterialInsertFails() {
+
+        // 在创建资料的时候抛出异常
+        MaterialCreateReqDTO request = new MaterialCreateReqDTO();
+        request.setTitle("Java 基础笔记");
+        request.setType("note");
+        request.setDescription("Java 学习资料");
+
+        when(materialMapper.insert(any(MaterialDO.class))).thenReturn(0);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> materialService.createMaterial(request)
+        );
+
+        assertEquals("资料创建失败", exception.getMessage());
+
+        verify(materialMapper).insert(any(MaterialDO.class));
+    }
+
+    @Test
+    void shouldRejectNullIdWhenGettingMaterial() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> materialService.getMaterial(null)
+        );
+        verifyNoInteractions(materialMapper);
+    }
+
+    @Test
+    void shouldRejectNullRequestWhenCreatingMaterial() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> materialService.createMaterial(null)
+        );
+
+        verifyNoInteractions(materialMapper);
+    }
+
+    @Test
+    void shouldRejectNullRequestWhenUpdatingMaterial() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> materialService.updateMaterial(1L, null)
+        );
+        verifyNoInteractions(materialMapper);
+    }
 }

@@ -3,6 +3,7 @@ package org.example.file_api.material.controller;
 import org.example.file_api.material.dto.MaterialRespDTO;
 import org.example.file_api.material.dto.MaterialPageRespDTO;
 import org.example.file_api.material.service.MaterialService;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,21 @@ class MaterialControllerTest {
         response.setCreationDateAt(LocalDateTime.of(2026, 7, 20, 10, 0));
         response.setUpdateDateAt(LocalDateTime.of(2026, 7, 20, 10, 0));
         return response;
+    }
+
+    @Test
+    void sholdReturnNotFoundWhenMaterialDoesNotExist() throws Exception {
+        when(materialService.getMaterial(999L))
+                .thenThrow(new ResourceNotFoundException("资料不存在: 999"));
+
+        mockMvc.perform(get("/api/materials/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("资料不存在: 999"))
+                .andExpect(jsonPath("$.path").value("/api/materials/999"));
+
+        verify(materialService).getMaterial(999L);
     }
 }
 

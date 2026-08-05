@@ -8,6 +8,7 @@ import org.example.file_api.material.dto.MaterialUpdateReqDTO;
 import org.example.file_api.material.domain.MaterialDO;
 import org.example.file_api.material.mapper.MaterialMapper;
 import org.springframework.stereotype.Service;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,10 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional
     public MaterialRespDTO createMaterial(MaterialCreateReqDTO request) {
+
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
         LocalDateTime now = LocalDateTime.now();
 
         MaterialDO material = new MaterialDO();
@@ -34,7 +39,11 @@ public class MaterialServiceImpl implements MaterialService {
         material.setCreatedAt(now);
         material.setUpdatedAt(now);
 
-        materialMapper.insert(material);
+        int affectedRows = materialMapper.insert(material);
+
+        if (affectedRows != 1) {
+            throw new IllegalStateException("资料创建失败");
+        }
 
         return toRespDTO(material);
     }
@@ -43,12 +52,15 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public MaterialRespDTO getMaterial(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+
         MaterialDO material = materialMapper.selectById(id);
 
         if (material == null) {
-            throw new IllegalArgumentException("资料不存在");
+            throw new ResourceNotFoundException("资料不存在: " + id);
         }
-
 
         return toRespDTO(material);
     }
@@ -56,10 +68,18 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional
     public MaterialRespDTO updateMaterial(Long id, MaterialUpdateReqDTO request) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+
         MaterialDO material = materialMapper.selectById(id);
 
         if (material == null) {
-            throw new IllegalArgumentException("资料不存在");
+            throw new ResourceNotFoundException("资料不存在: " + id);
         }
 
         material.setTitle(request.getTitle());
@@ -74,10 +94,14 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional
     public void deleteMaterial(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+
         MaterialDO material = materialMapper.selectById(id);
 
         if (material == null) {
-            throw new IllegalArgumentException("资料不存在");
+            throw new ResourceNotFoundException("资料不存在: " + id);
         }
 
         materialMapper.deleteById(id);

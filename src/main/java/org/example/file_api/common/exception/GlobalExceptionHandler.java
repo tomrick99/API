@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handelIllegalArgument(
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
             IllegalArgumentException exception,
             HttpServletRequest request
     ) {
