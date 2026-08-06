@@ -41,15 +41,21 @@ class TtsControllerTest {
     // 断言HTTP状态码应该是400Bad Request
     @Test
     void shouldRejectEmptyText() throws Exception{
+        TtsSynthesizeRequest request = new TtsSynthesizeRequest();
+        request.setText("");
+
         mockMvc.perform(post("/tts/synthesize")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"text": ""}
-                        """))
-                .andExpect(status().isBadRequest());
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message")
+                        .value("text: 合成文本不能为空"))
+                .andExpect(jsonPath("$.path")
+                        .value("/tts/synthesize"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
-        //断言这个假的ttsService从头到尾没有被碰过
-        //如果text为空 spring在进入方法体之前就会效验失败 那么Controller里面的返回压根就不应该执行
         verifyNoInteractions(ttsService);
     }
 
@@ -109,5 +115,24 @@ class TtsControllerTest {
 
         verify(ttsService).synthesize(any(TtsSynthesizeRequest.class));
     }
+
+   @Test
+    void shouldRejectSpeedAboveMaximum() throws Exception{
+        TtsSynthesizeRequest request = new TtsSynthesizeRequest();
+        request.setText("需要合成的文本");
+        request.setSpeed(101);
+
+        mockMvc.perform(post("/tts/synthesize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("speed: 语速不能大于100"))
+                .andExpect(jsonPath("$.path").value("/tts/synthesize"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verifyNoInteractions(ttsService);
+   }
 
 }
