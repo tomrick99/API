@@ -6,6 +6,8 @@ import org.example.file_api.folder.dto.FolderRespDTO;
 import org.example.file_api.folder.dto.FolderUpdateReqDTO;
 import org.example.file_api.folder.service.FolderService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
 @RequestMapping("/api/folders")
@@ -18,7 +20,10 @@ public class FolderController {
     }
 
     @PostMapping
-    public FolderRespDTO createFolder(@Valid @RequestBody FolderCreateReqDTO request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public FolderRespDTO createFolder(
+            @Valid @RequestBody FolderCreateReqDTO request
+    ) {
         return folderService.createFolder(request);
     }
 
@@ -28,13 +33,17 @@ public class FolderController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFolder(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFolder(
+            @PathVariable Long id) {
         folderService.deleteFolder(id);
     }
 
     @PutMapping("/{id}")
-    public FolderRespDTO updateFolder(@PathVariable Long id,
-                                      @Valid @RequestBody FolderUpdateReqDTO request) {
+    public FolderRespDTO updateFolder(
+            @PathVariable Long id,
+            @Valid @RequestBody FolderUpdateReqDTO request
+    ) {
         return folderService.updateFolder(id, request);
     }
 }

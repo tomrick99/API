@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.example.file_api.common.exception.GlobalExceptionHandler;
 import org.example.file_api.common.exception.ResourceNotFoundException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @ExtendWith(MockitoExtension.class)
 class FolderControllerTest {
@@ -56,7 +59,7 @@ class FolderControllerTest {
     }
 
     @Test
-    void shouldCreateFolder() {
+    void shouldCreateFolder() throws Exception {
 
         // 准备请求对象
         FolderCreateReqDTO request = new FolderCreateReqDTO();
@@ -72,20 +75,20 @@ class FolderControllerTest {
         response.setStatus(1);
 
         // Mock Service假设service正常返回了
-        when(folderService.createFolder(request)).thenReturn(response);
+        when(folderService.createFolder(any(FolderCreateReqDTO.class)))
+                .thenReturn(response);
 
-        // 直接调用Controller方法
-        FolderRespDTO result = folderController.createFolder(request);
-
-        assertSame(response, result);
-        assertEquals(1L, result.getId());
-        assertEquals("test", result.getName());
-        assertEquals("desc", result.getDescription());
-        assertEquals(10, result.getSort());
-        assertEquals(1, result.getStatus());
-
+        mockMvc.perform(post("/api/folders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.id").value(1))
+                                .andExpect(jsonPath("$.name").value("test"))
+                                        .andExpect(jsonPath("$.description").value("desc"))
+                                                .andExpect(jsonPath("$.sort").value(10))
+                                                        .andExpect(jsonPath("$.status").value(1));
         // 验证Controller有没有调用service
-        verify(folderService).createFolder(request);
+        verify(folderService).createFolder(any(FolderCreateReqDTO.class));
     }
 
     @Test
@@ -122,5 +125,14 @@ class FolderControllerTest {
                 .andExpect(jsonPath("$.path").value("/api/folders/999"));
 
         verify(folderService).getFolder(999L);
+    }
+
+    @Test
+    void shouldReturnNotContentWhenFolderIsDeleted() throws Exception {
+        mockMvc.perform(delete("/api/folders/1"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(folderService).deleteFolder(1L);
     }
 }
