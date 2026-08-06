@@ -128,7 +128,7 @@ class FolderControllerTest {
     }
 
     @Test
-    void shouldReturnNotContentWhenFolderIsDeleted() throws Exception {
+    void shouldReturnNoContentWhenFolderIsDeleted() throws Exception {
         mockMvc.perform(delete("/api/folders/1"))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));

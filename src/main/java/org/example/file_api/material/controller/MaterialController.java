@@ -7,6 +7,8 @@ import org.example.file_api.material.dto.MaterialRespDTO;
 import org.example.file_api.material.dto.MaterialUpdateReqDTO;
 import org.example.file_api.material.service.MaterialService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 // 核心链路 HTTP JSON -> MaterialController -> MaterialService
 // -> MaterialMapper -> material_mybatis
@@ -15,13 +17,16 @@ import org.springframework.web.bind.annotation.*;
 public class MaterialController {
     private final MaterialService materialService;
 
-    public MaterialController(MaterialService materialSercive) {
-        this.materialService = materialSercive;
+    public MaterialController(MaterialService materialService) {
+        this.materialService = materialService;
     }
 
     // 新增
     @PostMapping
-    public MaterialRespDTO createMaterial(@Valid @RequestBody MaterialCreateReqDTO request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public MaterialRespDTO createMaterial(
+            @Valid @RequestBody MaterialCreateReqDTO request
+    ) {
         return materialService.createMaterial(request);
     }
 
@@ -49,9 +54,9 @@ public class MaterialController {
 
     // 删除
     @DeleteMapping("/{id}")
-    public String deleteMaterial(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMaterial(@PathVariable Long id) {
         materialService.deleteMaterial(id);
-        return "material " + id + " is deleted";
     }
 
 }

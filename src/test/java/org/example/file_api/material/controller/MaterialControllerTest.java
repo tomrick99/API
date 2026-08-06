@@ -1,8 +1,6 @@
 package org.example.file_api.material.controller;
 
-import org.example.file_api.material.dto.MaterialCreateReqDTO;
-import org.example.file_api.material.dto.MaterialRespDTO;
-import org.example.file_api.material.dto.MaterialPageRespDTO;
+import org.example.file_api.material.dto.*;
 import org.example.file_api.material.service.MaterialService;
 import org.example.file_api.common.exception.ResourceNotFoundException;
 import org.springframework.http.MediaType;
@@ -16,6 +14,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -41,32 +40,29 @@ class MaterialControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateMaterial() throws Exception {
+    void shouldReturnCreatedWhenMaterialIsCreated() throws Exception{
+        MaterialCreateReqDTO request = new MaterialCreateReqDTO();
+        request.setTitle("Java 学习资料");
+        request.setType("PDF");
+        request.setDescription("MyBatis学习笔记");
 
-        // 先创建一个对象
         MaterialRespDTO response = buildResponse();
 
-        // 然后Mock的MaterialService被调用时 就返回这个对象
-        when(materialService.createMaterial(any())).thenReturn(response);
+        when(materialService.createMaterial(
+                any(MaterialCreateReqDTO.class)
+        )).thenReturn(response);
 
-        // Controller再把这个Java对象自动转换成JSON 测试再检查返回JSON里的id title等等是否符合预期
-        mockMvc.perform(post("/api/materials")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "title": "Java 学习资料",
-                            "type": "PDF",
-                            "description": "MyBatis学习笔记"
-                        }
-                        """))
-                .andExpect(status().isOk())
+        mockMvc.perform(
+                post("/api/materials")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Java 学习资料"))
                 .andExpect(jsonPath("$.type").value("PDF"))
                 .andExpect(jsonPath("$.description").value("MyBatis学习笔记"));
 
-        verify(materialService).createMaterial(any());
-
+        verify(materialService).createMaterial(any(MaterialCreateReqDTO.class));
     }
 
     // 查询ID为1的资料, 然后测试Controller是否把它正确转换成JSON返回
@@ -111,37 +107,35 @@ class MaterialControllerTest {
 
     @Test
     void shouldUpdateMaterial() throws Exception {
+        MaterialUpdateReqDTO request = new MaterialUpdateReqDTO();
+        request.setTitle("更新后的资料");
+        request.setType("DOC");
+        request.setDescription("更新后的描述");
+
         MaterialRespDTO response = buildResponse();
         response.setTitle("更新后的资料");
         response.setType("DOC");
         response.setDescription("更新后的描述");
-
-        when(materialService.updateMaterial(eq(1L), any()))
+        when(materialService.updateMaterial(eq(1L), any(MaterialUpdateReqDTO.class)))
                 .thenReturn(response);
 
         mockMvc.perform(put("/api/materials/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "title": "更新后的资料",
-                                    "type": "DOC",
-                                    "description": "更新后的描述"
-                                }
-                                """))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("更新后的资料"))
                 .andExpect(jsonPath("$.type").value("DOC"))
                 .andExpect(jsonPath("$.description").value("更新后的描述"));
 
-        verify(materialService).updateMaterial(eq(1L), any());
+        verify(materialService).updateMaterial(eq(1L), any(MaterialUpdateReqDTO.class));
     }
 
     @Test
-    void shouldDeleteMaterial() throws Exception {
+    void shouldReturnNoContentWhenMaterialIsDeleted() throws Exception {
         mockMvc.perform(delete("/api/materials/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("material 1 is deleted"));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
 
         verify(materialService).deleteMaterial(1L);
     }
