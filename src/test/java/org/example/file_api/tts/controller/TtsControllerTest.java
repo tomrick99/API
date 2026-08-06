@@ -8,6 +8,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
+import org.example.file_api.tts.dto.TtsSynthesizeRequest;
+import org.example.file_api.tts.provider.xfyun.XfyunRequestException;
+import tools.jackson.databind.ObjectMapper;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +26,9 @@ class TtsControllerTest {
     // 让Spring把已经准备好的对象注入进来 MockMvc是一个假的客户端 用来模拟 不用正真的启动服务器接口
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // 在Spring测试环境里面放一个假的TtsService
     @MockitoBean
@@ -76,4 +82,32 @@ class TtsControllerTest {
                     && Integer.valueOf(70).equals(request.getPitch())
         ));
     }
+
+    @Test
+    void shouldReturnBadGatewayWhenXfyunRequestFails() throws Exception{
+        TtsSynthesizeRequest request = new TtsSynthesizeRequest();
+        request.setText("需要合成的文本");
+        request.setSpeed(50);
+        request.setVolume(60);
+        request.setPitch(70);
+
+        when(ttsService.synthesize(any(TtsSynthesizeRequest.class)))
+                .thenThrow(new XfyunRequestException(
+                        503,
+                        "service unavailable"
+                ));
+
+        mockMvc.perform(post("/tts/synthesize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.status").value(502))
+                .andExpect(jsonPath("$.error").value("Bad Gateway"))
+                .andExpect(jsonPath("$.message").value("讯飞接口请求失败,Http状态码: 503"))
+                .andExpect(jsonPath("$.path").value("/tts/synthesize"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(ttsService).synthesize(any(TtsSynthesizeRequest.class));
+    }
+
 }

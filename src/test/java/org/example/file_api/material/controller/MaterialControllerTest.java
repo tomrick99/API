@@ -233,7 +233,7 @@ class MaterialControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("id: argument type mismatch, should be java.lang.Long"))
+                .andExpect(jsonPath("$.message").value("id: argument type mismatch, should be Long"))
                 .andExpect(jsonPath("$.path").value("/api/materials/abc"))
                 .andExpect(jsonPath("$.timestamp").exists());
 

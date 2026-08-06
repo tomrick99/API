@@ -2,6 +2,7 @@ package org.example.file_api.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.file_api.common.response.ApiErrorResponse;
+import org.example.file_api.tts.provider.xfyun.XfyunRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -92,7 +93,7 @@ public class GlobalExceptionHandler {
                 .map(error ->
                         error.getField() + ": " + error.getDefaultMessage()
                 )
-                .orElse("request argument verify failed");
+                .orElse("Request parameter validation failed");
 
         ApiErrorResponse response = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -134,7 +135,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException exception,
             HttpServletRequest request
     ) {
-        String requiredType = exception.getRequiredType() == null ? "Right format" : exception.getRequiredType().getName();
+        String requiredType = exception.getRequiredType() == null ? "except type" : exception.getRequiredType().getSimpleName();
 
         String message = exception.getName() + ": argument type mismatch, should be " + requiredType;
 
@@ -150,6 +151,25 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(response);
 
+    }
+
+    // 第三方讯飞接口请求失败: 502
+    @ExceptionHandler(XfyunRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleXfyunRequestException(
+            XfyunRequestException exception,
+            HttpServletRequest request
+    ) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                exception.getMessage(),
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(response);
     }
 
 }
