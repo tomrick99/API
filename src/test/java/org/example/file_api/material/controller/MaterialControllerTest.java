@@ -207,5 +207,37 @@ class MaterialControllerTest {
 
         verify(materialService).createMaterial(any());
     }
+
+    @Test
+    void shouldReturnBadRequestWhenJsonIsInvalid() throws Exception {
+    mockMvc.perform(post("/api/materials")
+    .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                    {
+                        "title": "Java 学习资料",
+                        "type": "PDF"
+                    """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("Invalid JSON format in request body"))
+            .andExpect(jsonPath("$.path").value("/api/materials"))
+            .andExpect(jsonPath("$.timestamp").exists());
+
+    verifyNoInteractions(materialService);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenMaterialIdTypeIsInvalid() throws Exception {
+        mockMvc.perform(get("/api/materials/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("id: argument type mismatch, should be java.lang.Long"))
+                .andExpect(jsonPath("$.path").value("/api/materials/abc"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verifyNoInteractions(materialService);
+    }
 }
 
