@@ -1,6 +1,6 @@
 # file_api
 
-`file_api` 是一个基于 Spring Boot 的后端学习项目，用于练习 REST API 分层、MySQL 数据访问、JWT 身份认证、多租户上下文，以及第三方语音合成服务接入。
+`file_api` 一个从基础 REST API 开始，逐步加入数据库、测试、鉴权、多租户、第三方 API、异常处理和 CI 的后端实习学习项目。
 
 目前项目包含素材管理、文件夹管理、Spring Security/JWT 鉴权和讯飞长文本 TTS。除登录接口外，所有接口默认都需要携带 JWT。
 
@@ -12,8 +12,9 @@
 - 权限控制：URL 角色校验、`@PreAuthorize` 方法级校验
 - 多租户示例：校验 `tenant-id` 请求头，并通过 `TenantContext` 向业务代码传递租户
 - 讯飞长文本 TTS：创建任务、轮询结果、下载音频并保存到本地
-- 统一异常响应：将资源不存在、非法参数等异常转换为 JSON
+- 统一异常响应：统一处理参数校验、请求格式、资源不存在、业务失败和第三方服务失败，并映射为 400 / 404 / 500 / 502
 - 单元与 Web 层测试：覆盖素材、文件夹、安全认证和 TTS 主要流程
+- 持续集成: GitHub Action 在push / pull request 时自动启动 Mysql测试环境并执行Maven verify
 
 ## 技术栈
 
@@ -27,6 +28,7 @@
 - Thymeleaf
 - Lombok
 - Maven Wrapper
+- GitHub Actions
 
 ## 项目结构
 
@@ -40,7 +42,7 @@ src/main/java/org/example/file_api
 └─ tts/                # TTS 业务、讯飞 Provider、HTTP 传输和音频存储
 
 src/main/resources
-├─ db/schema.sql       # material_mybatis 建表脚本
+├─ db/schema.sql       # Material / Folder 数据库建表脚本
 ├─ templates/          # Thymeleaf 示例页面
 └─ application-example.yaml
 ```
@@ -76,8 +78,9 @@ CREATE DATABASE IF NOT EXISTS fileapi
     COLLATE utf8mb4_unicode_ci;
 ```
 
-然后在 `fileapi` 数据库执行 [`src/main/resources/db/schema.sql`，](src/main/resources/db/schema.sql)创建素材表和文件夹。
-
+然后在 `fileapi` 数据库执行
+[`src/main/resources/db/schema.sql`](src/main/resources/db/schema.sql)，
+创建素材表和文件夹表。
 
 > 项目当前配置为 `spring.sql.init.mode: never`，启动时不会自动执行 `schema.sql`。
 
@@ -278,14 +281,12 @@ Content-Type: application/json
 
 ## 测试
 
-运行全部测试：
+### 本地测试
+
+运行完整项目验证：
 
 ```powershell
-.\mvnw.cmd test
-```
-
-测试代码位于 `src/test/java`。TTS 单元测试通过模拟第三方传输层验证业务流程，不需要真实调用讯飞接口。
-完整测试会加载 Spring 应用上下文，因此运行前仍需保证 MySQL 已启动且数据库连接配置有效。
+.\mvnw.cmd clean verify
 
 ## 当前项目定位与限制
 
