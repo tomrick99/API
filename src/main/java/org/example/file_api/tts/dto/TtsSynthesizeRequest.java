@@ -28,8 +28,8 @@ public class TtsSynthesizeRequest {
     @Max(value = 100, message = "音量不能大于100")
     private Integer volume;
 
-    @Min(value = 0, message = "音量不能小于0")
-    @Max(value = 100, message = "音量不能大于100")
+    @Min(value = 0, message = "音调不能小于0")
+    @Max(value = 100, message = "音调不能大于100")
     private Integer pitch;
 
 

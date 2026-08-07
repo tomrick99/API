@@ -40,13 +40,13 @@ class TtsControllerTest {
     // 请求体内容为空 让NotBlank效验失败
     // 断言HTTP状态码应该是400Bad Request
     @Test
-    void shouldRejectEmptyText() throws Exception{
+    void shouldRejectEmptyText() throws Exception {
         TtsSynthesizeRequest request = new TtsSynthesizeRequest();
         request.setText("");
 
         mockMvc.perform(post("/tts/synthesize")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
@@ -61,7 +61,7 @@ class TtsControllerTest {
 
     //准备一个假的TtsSynthesizeResp 告诉假的ttsService如果有人调用 就返回这个response 用MockMvc发一个合法JSON请求 断言状态码为200  断言返回JSON里有filePath和message
     @Test
-    void shouldReturnSynthesizeResponse() throws Exception{
+    void shouldReturnSynthesizeResponse() throws Exception {
         TtsSynthesizeResp response = new TtsSynthesizeResp();
         response.setFilePath("uploads/test.mp3");
         response.setMessage("success");
@@ -69,13 +69,13 @@ class TtsControllerTest {
                 thenReturn(response); // when是当mock被调用时 ttsService.synthesize(any())意思是不管传进来的Request具体是什么 只要调用synthesize就算 thenReturn(response)那就返回我们刚刚造好的response
 
         mockMvc.perform(post("/tts/synthesize").contentType(MediaType.APPLICATION_JSON).content("""
-                {
-                    "text": "hello",
-                    "speed": 50,
-                    "volume": 60,
-                    "pitch": 70
-                }
-                """))
+                        {
+                            "text": "hello",
+                            "speed": 50,
+                            "volume": 60,
+                            "pitch": 70
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.filePath").value("uploads/test.mp3"))
                 .andExpect(jsonPath("$.message").value("success"));
@@ -83,14 +83,14 @@ class TtsControllerTest {
         // argThat 意思是不只要求有参数 要求这个参数还满足某些条件 lambda的意思是拿导传给service的哪个request然会检查后面的各种字段
         verify(ttsService).synthesize(argThat(request ->
                 "hello".equals(request.getText())
-                    && Integer.valueOf(50).equals(request.getSpeed())
-                    && Integer.valueOf(60).equals(request.getVolume())
-                    && Integer.valueOf(70).equals(request.getPitch())
+                        && Integer.valueOf(50).equals(request.getSpeed())
+                        && Integer.valueOf(60).equals(request.getVolume())
+                        && Integer.valueOf(70).equals(request.getPitch())
         ));
     }
 
     @Test
-    void shouldReturnBadGatewayWhenXfyunRequestFails() throws Exception{
+    void shouldReturnBadGatewayWhenXfyunRequestFails() throws Exception {
         TtsSynthesizeRequest request = new TtsSynthesizeRequest();
         request.setText("需要合成的文本");
         request.setSpeed(50);
@@ -104,8 +104,8 @@ class TtsControllerTest {
                 ));
 
         mockMvc.perform(post("/tts/synthesize")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.status").value(502))
                 .andExpect(jsonPath("$.error").value("Bad Gateway"))
@@ -116,15 +116,15 @@ class TtsControllerTest {
         verify(ttsService).synthesize(any(TtsSynthesizeRequest.class));
     }
 
-   @Test
-    void shouldRejectSpeedAboveMaximum() throws Exception{
+    @Test
+    void shouldRejectSpeedAboveMaximum() throws Exception {
         TtsSynthesizeRequest request = new TtsSynthesizeRequest();
         request.setText("需要合成的文本");
         request.setSpeed(101);
 
         mockMvc.perform(post("/tts/synthesize")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
@@ -133,6 +133,26 @@ class TtsControllerTest {
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verifyNoInteractions(ttsService);
-   }
+    }
+
+
+    @Test
+    void shouldRejectPitchAboveMaximum() throws Exception {
+        TtsSynthesizeRequest request = new TtsSynthesizeRequest();
+        request.setText("需要合成的文本");
+        request.setPitch(101);
+
+        mockMvc.perform(post("/tts/synthesize")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("pitch: 音调不能大于100"))
+                .andExpect(jsonPath("$.path").value("/tts/synthesize"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verifyNoInteractions(ttsService);
+    }
 
 }
