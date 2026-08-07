@@ -76,22 +76,8 @@ CREATE DATABASE IF NOT EXISTS fileapi
     COLLATE utf8mb4_unicode_ci;
 ```
 
-然后在 `fileapi` 数据库执行 [`src/main/resources/db/schema.sql`](src/main/resources/db/schema.sql)，创建素材表。
+然后在 `fileapi` 数据库执行 [`src/main/resources/db/schema.sql`，](src/main/resources/db/schema.sql)创建素材表和文件夹。
 
-当前 `schema.sql` 尚未包含文件夹表；如需调用文件夹接口，还需执行：
-
-```sql
-CREATE TABLE IF NOT EXISTS material_folder (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(500),
-    sort INT NOT NULL DEFAULT 100,
-    status INT NOT NULL DEFAULT 1,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    PRIMARY KEY (id)
-);
-```
 
 > 项目当前配置为 `spring.sql.init.mode: never`，启动时不会自动执行 `schema.sql`。
 
