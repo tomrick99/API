@@ -7,6 +7,7 @@ import org.example.file_api.folder.dto.FolderRespDTO;
 import org.example.file_api.folder.dto.FolderUpdateReqDTO;
 import org.example.file_api.folder.mapper.FolderMapper;
 import org.springframework.stereotype.Service;
+import org.example.file_api.common.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +23,7 @@ public class FolderServiceImpl implements FolderService {
     public FolderRespDTO createFolder(FolderCreateReqDTO request) {
 
         if(request==null){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("request cannot be null");
         }
 
         FolderDO folder = new FolderDO();
@@ -49,18 +50,14 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public FolderRespDTO getFolder(Long id) {
 
-        if(id==null){
-            throw new IllegalArgumentException();
-        }
-
         if (id == null) {
-            throw new IllegalArgumentException("id is null");
+            throw new IllegalArgumentException("id cannot be null");
         }
 
         FolderDO folder = folderMapper.selectById(id);
 
         if (folder == null) {
-            throw new IllegalArgumentException("folder is null");
+            throw new ResourceNotFoundException("folder is not exist" + id);
         }
 
         return toRespDTO(folder);
@@ -74,17 +71,17 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public FolderRespDTO updateFolder(Long id, FolderUpdateReqDTO request) {
         if (id == null) {
-            throw new IllegalArgumentException("id is null");
+            throw new IllegalArgumentException("id cannot be null");
         }
 
         if (request == null) {
-            throw new IllegalArgumentException("request is null");
+            throw new IllegalArgumentException("request cannot be null");
         }
 
         FolderDO folder = folderMapper.selectById(id);
 
         if (folder == null) {
-            throw new IllegalArgumentException("folder is null");
+            throw new ResourceNotFoundException("folder is not exist" + id);
         }
         else {
             folder.setName(request.getName());
@@ -106,13 +103,13 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void deleteFolder(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("id is null");
+            throw new IllegalArgumentException("id cannot be null");
         }
 
         FolderDO folder = folderMapper.selectById(id);
 
         if (folder == null) {
-            throw new IllegalArgumentException("folder is null");
+            throw new ResourceNotFoundException("folder is not exist" + id);
         }
 
         folderMapper.deleteById(id);

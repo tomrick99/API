@@ -8,13 +8,13 @@ import lombok.Data;
 @Data
 public class FolderCreateReqDTO {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "folder title cannot be empty")
+    @Size(max = 100, message = "folder name length cannot exceed 100 characters")
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "folder description length cannot exceed 500 characters")
     private String description;
 
-    @Min(0)
+    @Min(value = 0, message = "sort value cannot less than 0")
     private Integer sort;
 }

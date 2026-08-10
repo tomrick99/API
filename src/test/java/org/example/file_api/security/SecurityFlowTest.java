@@ -1,12 +1,14 @@
 package org.example.file_api.security;
 
-import org.example.file_api.config.SecurityConfig;
-import org.example.file_api.controller.AdminController;
-import org.example.file_api.controller.AuthController;
-import org.example.file_api.controller.CurrentUserController;
-import org.example.file_api.controller.MethodSecurityController;
-import org.example.file_api.controller.TenantController;
-import org.example.file_api.controller.Test2Controller;
+import org.example.file_api.security.config.SecurityConfig;
+import org.example.file_api.security.context.CurrentUserProvider;
+import org.example.file_api.security.controller.AdminController;
+import org.example.file_api.security.controller.AuthController;
+import org.example.file_api.security.controller.CurrentUserController;
+import org.example.file_api.security.controller.MethodSecurityController;
+import org.example.file_api.security.controller.TenantController;
+import org.example.file_api.practice.web.Test2Controller;
+import org.example.file_api.security.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
