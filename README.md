@@ -103,9 +103,9 @@ $env:DB_PASSWORD = "你的数据库密码"
 如需使用讯飞 TTS，再设置：
 
 ```powershell
-$env:XFYUN_APP_ID = "你的 App ID"
-$env:XFYUN_API_KEY = "你的 API Key"
-$env:XFYUN_API_SECRET = "你的 API Secret"
+$env:XFYUN_APP_ID = "App ID"
+$env:XFYUN_API_KEY = "API Key"
+$env:XFYUN_API_SECRET = "API Secret"
 ```
 
 并在本地 `application.yaml` 的 `xfyun.long-text-tts` 下补充运行参数：

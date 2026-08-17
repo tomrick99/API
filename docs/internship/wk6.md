@@ -1,3 +1,7 @@
+# Week 6
+
+> 周总结：学习 Redis、Nacos、Gateway，并完成 Folder 模块和测试链路。
+
 1 上周Token不是存在redis 而是JWT 服务端生成后直接返回给前端 后续请求由服务端验证JWT
 	Token有效期是两个小时 并且项目重启之后 密钥重新生成
 	

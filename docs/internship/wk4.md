@@ -1,4 +1,8 @@
-﻿1 增加前端JSON效验validation
+﻿# Week 4
+
+> 周总结：学习参数校验与 JUnit、Spring Boot、MyBatis 测试。
+
+1 增加前端JSON效验validation
 
 2 学习写test
 	test都放在test文件夹下 不要和正式代码放在一起 

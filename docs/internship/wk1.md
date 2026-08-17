@@ -1,3 +1,7 @@
+# Week 1
+
+> 周总结：学习 Spring Boot API、MySQL 与 Repository CRUD 基础。
+
 ## 一 API (Application programming interface)
 
 API不是功能本身 是外界调用后端的一个入口
@@ -39,26 +43,31 @@ API不是功能本身 是外界调用后端的一个入口
 @PathVariable是从路径里面拿变量
 @RequestBody从HTTP请求体body里面拿JSON 并且转成Java对象
 
-    eg：
-        @GetMapping("/{id}")
-        public String getMaterialById(@PathVariable Integer id) {
-        return "material " + id;
-        }
-
-        GET /api/materials/1
-        数字1会进入 Integer id
-
-    eg：
-        @PostMapping
-        public String createMaterial(@RequestBody MaterialRequest request) {
-            return request.getTitle();
-        }
-
-        客户端发送
-            {"title": "Java API",
-            "description": "Spring Boot request body practice"}
+eg：
+```java
+@GetMapping("/{id}")
+public String getMaterialById(@PathVariable Integer id) {
+return "material " + id;
+}
+//GET /api/materials/1
+//数字1会进入 Integer id
+```
         
-        Spring自动转成MaterialRequest request
+
+eg：
+```java
+@PostMapping
+public String createMaterial(@RequestBody MaterialRequest request) {
+    return request.getTitle();
+}
+
+//客户端发送
+//    {"title": "Java API",
+//    "description": "Spring Boot request body practice"}
+//
+//Spring自动转成MaterialRequest request
+```
+
     
 ## 五 DTO (Data Transfer Object) 
 
@@ -73,8 +82,10 @@ API不是功能本身 是外界调用后端的一个入口
 数据库里的对象，差不多等于数据库表里的一行，后端保存的一个对象
 
 ## 七 Map内存模拟数据库
-    private final Map<Integer, Material> database = new HashMap<>();
-    private Integer nextID = 1;
+```java
+private final Map<Integer, Material> database = new HashMap<>();
+private Integer nextID = 1;
+```
 
 key是id value是对象
 
@@ -145,11 +156,13 @@ MySQL Database名字得和JBDC URL里一样
 Spring Boot连接数据库看的是JBDC URL的数据库名
 
 ## 十二 数据库基本查询
-    SHOW DATABASES;
-    USE fileapi;
-    SHOW TABLES;
-    DESC material;
-    SELECT * FROM material;
+```mysql
+SHOW DATABASES;
+USE fileapi;
+SHOW TABLES;
+DESC material;
+SELECT * FROM material;
+```
 
 ## 十三 YAML配置
 YAML对空格非常敏感
@@ -176,17 +189,20 @@ Repository识别不到 先确认pom.xml里面的依赖
 
 ## 十五 Controller从Map换成Repository
 把原来的假数据库
+```java
+private final Map<Integer, Material> database = new HashMap<>();
+private Integer nextID = 1;
+```
     
-    private final Map<Integer, Material> database = new HashMap<>();
-    private Integer nextID = 1;
     
 换成了
+```java
+private final MaterialRepository materialRepository;
 
-    private final MaterialRepository materialRepository;
-
-    public Controller(MaterialRepository materialRepository) {
-    this.materialRepository = materialRepository;
-    }
+public Controller(MaterialRepository materialRepository) {
+this.materialRepository = materialRepository;
+}
+```
 
 这一步叫构造器注入
 
