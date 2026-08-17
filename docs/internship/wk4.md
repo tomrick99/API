@@ -2,9 +2,11 @@
 
 > 周总结：学习参数校验与 JUnit、Spring Boot、MyBatis 测试。
 
-1 增加前端JSON效验validation
+## 一、参数校验与测试基础
 
-2 学习写test
+### 1 增加前端JSON效验validation
+
+### 2 学习写test
 	test都放在test文件夹下 不要和正式代码放在一起 
 	否则测试代码和生产代码放在一起参与正式编译和打包,
 	测试依赖,模拟对象以及测试数据也容易污染正式项目
@@ -13,26 +15,27 @@
 	注解@NotBlank/@Min/@Max是写在字段上面的规则
 	Validator是一个对象 是读取这些规则并检查对象的人
 
-3 测试的类型不能写成public 
+### 3 JUnit 5 的测试类和方法可以是public, 但通常不要求必须public 
 
-4 Junit 是Java用来编写和自动化测试的框架
+### 4 Junit 是Java用来编写和自动化测试的框架
 	写一段代码 Junit自动调用它 然后检查结果是否符合预期
 	
-5 用mvn.cmd -Dtest=文件名 test来跑单个测试
+### 5 用mvn.cmd -Dtest=文件名 test来跑单个测试
 	用mvn.cmd test来跑全部测试
 	
-6 validation错误和Junit的测试错误不是一回事
+### 6 validation错误和Junit的测试错误不是一回事
 	
 	violation.size()参数效验发现了几个错误
 	Failure是断言失败了几次, 测试结果跑完了 但是结果和预期不一致
 	Errors是测试执行中炸了几次 比如说空指针,构造器异常等等
 	
-6.5 断言失败是什么意思 断言是什么意思
-	断言是测试里面认为的结果
+### 6.5 断言失败是什么意思 断言是什么意思
+断言是测试里面认为的结果  
+
 	eg: assertFalse(violations.isEmpty());意思是我断定violation.isEmpty()应该是False
 		等同于violations不应该为空
 	
-7 一个test的运行流程
+### 7 一个test的运行流程
 	Maven 启动测试
 	↓
 	JUnit 找到 TtsSynthesizeRequestValidationTest一个测试类
@@ -53,63 +56,77 @@
 	↓
 	 assertFalse(...)
 	 
-8 测试里面是单纯测一个类 不会完成一个真实的业务逻辑
+## 二、单元测试与 Web 层测试
 
-9 测试之后产生的dumpstream文件不用管 是构建产物 target之后mvn clean会自动删掉 
+### 8 测试里面是单纯测一个类 不会完成一个真实的业务逻辑
 
-10 target是Maven约定的构建输出目录
+### 9 测试之后产生的dumpstream文件不用管 是构建产物 target之后mvn clean会自动删掉 
+
+### 10 target是Maven约定的构建输出目录
 	运行了mvn test / mvn package / mvn compile
 	之后 Maven会把编译出来的class测试报告 临时文件等自动放到target目录里面
 	
-12 mvn.cmd clean test是先删掉整个test 再重头编译 重头跑测试
+### 12 `mvn.cmd clean test`是clean删除的是target构建输出目录, 然后Maven重新编译并执行测试
 
-13  @Test
-    void ShouldRejectInvalidTest() {
-        TtsSynthesizeRequest request = new TtsSynthesizeRequest();
-        if (request.getSpeed() > 100 || request.getVolume() > 100 || request.getPitch() > 100) {
-            var violation = validator.validate(request);
-            assertFalse(violation.isEmpty());
-        }
-    }
-	逻辑不对 
-	1 request里面没有设置这几个东西 他们都是默认值null
-	  直接拿null来比较会触发空指针
-    
-	2 如果把断言放进if 测试可能什么都没测就通过了 因为后面 如果if条件不成立 直接就运行下去了
+### 13 正确编写 DTO 参数校验测试
+```java
+@Test
+void shouldRejectInvalidSpeed() {
+    TtsSynthesizeRequest request = new TtsSynthesizeRequest();
+    request.setText("hello");
+    request.setSpeed(101);
+
+    var violations = validator.validate(request);
+
+    assertFalse(violations.isEmpty());
+}
+```
+原写法的问题:  
+1 request 没有设置 speed、volume、pitch 时，它们都是 null，直接比较会触发空指针。  
+2 如果把断言放进 if，条件不成立时测试会跳过断言而直接通过。  
+3 测试的正确流程是：先构造非法值，再调用 Validator，最后断言校验结果不为空。
 	
-	3 这个测试的目标是构造一个非法值 再让断言效验抓住它 不是先写if判断它是不是非法
-	
-14 DTO测试 自己new对象
+### 14 DTO测试 自己new对象
 	Controller测试模拟HTTP请求 让Spring帮忙触发@Valid
 
-15 .\mvnw.cmd -Dtest=类名 test  用的是项目里面的Maven Wrapper 在项目里面最好用这个 更稳定
-VS mvn.cmd -Dtest=类名 test       用的是电脑环境变量里面的Maven
+### 15 使用 Maven Wrapper 运行指定测试
+`.\mvnw.cmd -Dtest=测试类名 test` 使用项目内配置的 Maven Wrapper，推荐在项目中优先使用，能保持 Maven 版本一致。  
+`mvn -Dtest=测试类名 test` 使用电脑环境变量中的 Maven，版本或配置不同可能导致结果不一致。
 
-16 @WebMvcTest(类名.class) 只启动Spring MVC相关的测试环境 并且重点测试类名这个文件
-    @Autowired 是让Spring把已经准备好的对象注入进来
-    MockMvc可以理解成假的HTTP客户端
+### 16 @WebMvcTest(类名.class)
+- @WebMvcTest 是 Spring MVC 切片测试：加载指定 Controller 相关的 Web 环境，
+用于测试路由、JSON 绑定、@Valid 校验和响应结果。  
+- @Autowired 用于注入 Spring 已创建的对象；MockMvc 可以理解为不启动真实服务器的模拟 HTTP 客户端。  
+- Controller 依赖的 Service 通常使用 @MockitoBean 提供模拟对象。
 	
-17 注意Spring boot4.1 和spring boot 3 2的写法不一样 4分的更细
+### 17 Spring Boot 4.1 与 3.x 的测试写法
+当前项目使用 Spring Boot 4.1.0，Controller 测试使用 @MockitoBean。  
+阅读 Spring Boot 3.x 的资料时常会看到 @MockBean；复制示例前要先确认依赖版本和导入包，不能混用。
 
-18 IDEA自动导入包名的时候得检查 
+### 18 IDEA自动导入包名的时候得检查 
 
-19 测试就是把包关联的包都用假数据替代 只看当前包的整体逻辑
+### 19 单元测试与集成测试的区别
+	单元测试通常使用 Mock 替代依赖，只验证当前类或当前层的逻辑。
+	集成测试会启动真实组件链路，例如 MapperTest 验证 Spring、MyBatis 与 MySQL 的协作是否正确。
 
-20 加测试的规则:
+### 20 加测试的规则:
 	一个生产类对应一个测试类
 	
-21 intellij里面写脚本 它时普通的文本文件 是用来保存建表命令的 不会直接自动多一张表
+## 三、SQL、DO 与 Mapper 基础
+
+### 21 intellij里面写脚本 它时普通的文本文件 是用来保存建表命令的 不会直接自动多一张表
 
 	把脚本执行到Mysql 才会真正创建一个表
 	
 流程: 在intellij写完脚本 执行SQL脚本 MySQL收到创表指令 创表 存表 在navicat刷新之后看到这张表
 注意:navicat只是一个可视化工具
 
-22 回顾SQL
-	和JAVA一样 每一行语句后以;结尾
+### 22 回顾SQL
+和JAVA一样 每一行语句后以;结尾
+
 	1 DESC 标名; 查看表的类型 格式
 	2 增 
-		增表
+		增数据行
 		INSERT INTO 表名
 		(列名, 列名, 列名)
 		VALUES
@@ -119,8 +136,8 @@ VS mvn.cmd -Dtest=类名 test       用的是电脑环境变量里面的Maven
 		INSERT INTO TableA
 		(a, b, c, d)
 		VALUES
-		('1', '2', '3', '4')
-		('1', '3', '5', '7')
+		('1', '2', '3', '4'),
+		('1', '3', '5', '7'),
 		('2', '4', '6', '8');
 		
 		
@@ -137,20 +154,20 @@ VS mvn.cmd -Dtest=类名 test       用的是电脑环境变量里面的Maven
 		
 	5 查 
 		查所有
-		 SELECT * FROM 表名; 
+            SELECT * FROM 表名; 
 		
 		按照id查(WHERE 是条件)
-		 SELECT * FROM 表名
-		 WHERE id = 1;
+            SELECT * FROM 表名
+            WHERE id = 1;
 		 
 		模糊查询
-		 SELECT * FROM 表名
-		 WHERE title LIKE '%MySQL%';
+            SELECT * FROM 表名
+            WHERE title LIKE '%MySQL%';
 		 
 		排序
-		  DESC倒叙 最新的在前 ASC是正序
-		 SELECT * FROM 表名
-		 ORDER BY 列名 DESC;
+            DESC降序 ASC是正序 只有按照时间字段排序才表示最新的在前面
+            SELECT * FROM 表名
+            ORDER BY 列名 DESC;
 		 
 		分页LIMIT
 		第一页每页两条
@@ -160,64 +177,73 @@ VS mvn.cmd -Dtest=类名 test       用的是电脑环境变量里面的Maven
 		
 		OFFSET N;是跳过前N条查询结果
 		 
-23 MaterialDO是一条资料数据. 它把MySQL里面的一行 变成Java里面的一个对象 每一列对应一个列名
-	@TableName和@TableId两个注解 一个是对应表名 一个是对应某个关键属性
+### 23 MaterialDO 表示一条资料数据
+MaterialDO 把 MySQL 表中的一行数据映射成 Java 对象，每个字段通常对应一列。  
+@TableName 对应数据库表名；@TableId 对应主键字段。
 	
-24 MaterialMapper操作资料表的工具 它把增删改查全部汇总到了这个java类里面
-	是一个Mapper接口 继承了BaseMapper这个接口 然后告诉BaseMapper 要操作的数据类型是MaterialDO
-	调用这个Mapper里面的方法 就去执行SQL
+### 24 MaterialMapper 是操作资料表的 Mapper 接口
+它继承 BaseMapper<MaterialDO>，声明资料表相关的查询与增删改能力。  
+调用 Mapper 方法时，MyBatis / MyBatis-Plus 会生成并执行对应的 SQL。
 	
-25 BaseMapper<MaterialDO> 意思是把BaseMapper里面原有的方法参数都变成MaterialDO类型的
+### 25 BaseMapper<MaterialDO> 的含义
+MaterialDO 是泛型类型参数，表示 BaseMapper 继承来的通用 CRUD 方法以 MaterialDO 作为主要操作对象。
 
-26 没有写构造器的话Java会自动给一个空参构造器 之后再用setter和getter设置字段
+### 26 没有写构造器的话Java会自动给一个空参构造器 之后再用setter和getter设置字段
 
-27 MapperTest是Mapper集成测试是验证Mapper到Mybatis到MySQL表这条链路的逻辑是不是正确的
+## 四、Mapper 集成测试与 MyBatis
+
+### 27 MapperTest是Mapper集成测试是验证Mapper到Mybatis到MySQL表这条链路的逻辑是不是正确的
 	
-28 @SpringBootTest
-	意思是启动Spring Boot测试环境 因为SpringMybatis创建出来的代理对象 不是new的 所以要让Spring启动起来
+### 28 @SpringBootTest
+	@SpringBootTest 会启动完整的 Spring Boot 应用上下文。
+	MyBatis 为 Mapper 接口创建代理对象，因此 Mapper 不是手动 new 出来的，需要由 Spring 启动并管理。
+	@Autowired 注入的是 Spring 管理的 Mapper 代理 Bean。
 	
-	@Autowired 是Spring把这个Mapper类给注入进来 这个Mapper是接口没有实现类
-	
-29 @BeforeEach和@AfterEach注解
+### 29 @BeforeEach和@AfterEach注解
 	在测试前清理: 防止上次的残留数据
 	在测试后清理: 保持这次数据库的干净
 	
-30 Mybatis的核心作用是把Java方法调用 转换成SQL执行 再把SQL查询结果 转换成Java对象
+### 30 Mybatis的核心作用是把Java方法调用 转换成SQL执行 再把SQL查询结果 转换成Java对象
 	也就是Java方法和SQL之间的桥
 	
-31 测试文件里通常不需要手写try/catch 如果测试方法抛异常 JUnit会显示Errors: 1 
-	try/catch是只有在期待抛异常的时候才用
+### 31 测试异常的写法
+	测试方法可以直接声明 throws Exception；未预期的异常会让 JUnit 将测试记录为 Error。
+	如果测试目标就是验证异常，应使用 assertThrows，而不是手写 try/catch。
 	
-32 不是客户端传的JSON直接进入数据库的
-	JSON->DTO->效验->DO->Mapper->数据库
+## 五、DTO、业务校验与事务
+
+### 32 不是客户端传的JSON直接进入数据库的
+	JSON -> 请求 DTO -> 参数校验 -> Service 业务处理 -> DO -> Mapper -> 数据库
 	
-	DTO怎么辨别 这里要靠Controller方法参数决定 
-	如果Controller写了@RequestBody MaterialCreateReqDTO request
-		Spring就会把JSON变成MaterialCreateReqDTO
-	如果写@RequestBody MaterialDO request
-		Spring就会把JSON转成MaterialDO
+	Controller 方法参数决定 Spring 要把 JSON 转成什么对象：
+	如果 Controller 写了 @RequestBody MaterialCreateReqDTO request，Spring 会把 JSON 转成 MaterialCreateReqDTO。
+	技术上也可以写 @RequestBody MaterialDO request，Spring 会把 JSON 转成 MaterialDO。
 		
-	所以选择只接收DTO
-	就是说这个接口里只允许DTO里的字段
-	而直接用DO的话 说明用户可以随便传信息 id和时间都可以自定义
+	接口推荐只接收 DTO，因为 DTO 能明确允许前端提交哪些字段。
+	直接接收 DO 容易让 id、创建时间等不应由前端控制的字段被绑定，增加误改风险。
 	
-33 客户端传进来的数据在进入数据库之前都要效验 一般有两层效验
-	一 DTO参数效验
+### 33 客户端数据进入数据库前的两层校验
+	一、DTO 参数校验：检查格式和边界。
 		@NotBlank
 		@Size
-	二 Service业务层的效验
+	二、Service 业务校验：检查是否符合业务规则。
 		eg:
 		更新时id对应数据必须存在
 		删除时id对应数据必须存在
 		pageSize不能太大
 		sortBy必须在白名单..
 		
-34 注解Transactional 表示这个方法里了的数据库操作要放在一个事务里面
-	增删改三者要加 查询不该数据库 可以不加
+### 34 @Transactional 的作用
+	@Transactional 为方法定义事务边界：一组相关数据库操作要么全部成功，要么在异常时一起回滚。
+	当一个业务包含多个需要保持一致的写操作时应使用事务；查询也可以按需要使用 readOnly 事务，不应机械地按增删改查决定。
 	
-35 类忘记implements它的接口 @Override爆红 Override是再实现接口里定义的方法 没有implements 就不知道这个类在重写谁
+### 35 @Override 爆错的常见原因
+	@Override 表示重写父类方法或实现接口方法。
+	如果类没有 implements 对应接口、没有继承对应父类，或方法签名不一致，@Override 就会报错。
 
-36 问题: intellij里跑测试和在终端用Maven跑允许环境不一样 
+## 六、测试环境与运行问题排查
+
+### 36 问题: intellij里跑测试和在终端用Maven跑允许环境不一样 
 	intellij 因为Mockito要创建一个MaterialMapper 底层需要Byte buddy动态生成mock对象
 	Intellij run的时候Java会默认临时目录可能指向某个没有权限的路径 所以创建agent失败 setup失败
 		Java agent: JVM运行时外挂工具
