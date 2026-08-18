@@ -1,6 +1,6 @@
 # file_api
 
-`file_api` 一个从基础 REST API 开始，逐步加入数据库、测试、鉴权、多租户、第三方 API、异常处理和 CI 的后端实习学习项目。
+`file_api` 是一个从基础 REST API 开始，逐步加入数据库、测试、鉴权、多租户、第三方 API、异常处理和 CI 的后端实习学习项目。
 
 目前项目包含素材管理、文件夹管理、Spring Security/JWT 鉴权和讯飞长文本 TTS。除登录接口外，所有接口默认都需要携带 JWT。
 
@@ -14,7 +14,7 @@
 - 讯飞长文本 TTS：创建任务、轮询结果、下载音频并保存到本地
 - 统一异常响应：统一处理参数校验、请求格式、资源不存在、业务失败和第三方服务失败，并映射为 400 / 404 / 500 / 502
 - 单元与 Web 层测试：覆盖素材、文件夹、安全认证和 TTS 主要流程
-- 持续集成: GitHub Action 在push / pull request 时自动启动 Mysql测试环境并执行Maven verify
+- 持续集成：GitHub Actions 在 push / pull request 时自动启动 MySQL 测试环境并执行 Maven verify
 
 ## 技术栈
 
@@ -97,7 +97,7 @@ Copy-Item src/main/resources/application-example.yaml src/main/resources/applica
 ```powershell
 $env:DB_URL = "jdbc:mysql://localhost:3306/fileapi?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true"
 $env:DB_USERNAME = "root"
-$env:DB_PASSWORD = "你的数据库密码"
+$env:DB_PASSWORD = "数据库密码"
 ```
 
 如需使用讯飞 TTS，再设置：
@@ -287,6 +287,15 @@ Content-Type: application/json
 
 ```powershell
 .\mvnw.cmd clean verify
+```
+
+### GitHub Actions
+
+工作流 [`ci.yml`](.github/workflows/ci.yml) 会在 push 和 pull request 时使用 Java 21 与 MySQL 8.4 执行：
+
+```bash
+./mvnw -B clean verify
+```
 
 ## 当前项目定位与限制
 
@@ -297,9 +306,23 @@ Content-Type: application/json
 - TTS 音频仅保存到服务端本地目录，尚未实现文件上传、文件下载或对象存储。
 - `practice` 包中的接口和页面用于框架学习，不属于主要业务 API。
 
+## 实习周记
+
+| 周次 | 主要内容 |
+| --- | --- |
+| [Week 1](docs/internship/wk1.md) | Spring Boot API、MySQL 与 Repository CRUD |
+| [Week 2](docs/internship/wk2.md) | 素材接口、TTS 调用链、配置与日志 |
+| [Week 3](docs/internship/wk3.md) | TTS 分层、签名、异步任务与音频保存 |
+| [Week 4](docs/internship/wk4.md) | 参数校验、JUnit 与 MyBatis 测试 |
+| [Week 5](docs/internship/wk5.md) | 动态 SQL、分层测试与 Spring Security |
+| [Week 6](docs/internship/wk6.md) | Redis、Nacos、Gateway 与 Folder 模块 |
+| [Week 7](docs/internship/wk7.md) | 项目重构、异常规范、CI 与安全流程 |
+| [Week 8](docs/internship/wk8.md) | Fresh Clone、OOP、代码阅读与本地排错 |
+
 ## 参考资料
 
 - [讯飞长文本语音合成 API 文档](https://www.xfyun.cn/doc/tts/long_text_tts/API.html)
 - [Spring Boot Reference Documentation](https://docs.spring.io/spring-boot/reference/)
 - [Spring Security Reference](https://docs.spring.io/spring-security/reference/)
 - [MyBatis-Plus Documentation](https://baomidou.com/)
+
